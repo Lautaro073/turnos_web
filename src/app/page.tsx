@@ -7,6 +7,7 @@ import { Card } from '@/components/ui/card';
 import Header from '@/components/cliente/Header';
 import Footer from '@/components/cliente/Footer';
 import { getServicios } from '@/lib/servicios-cache';
+import { getVisibleServiceIcon } from '@/lib/reservas';
 import type { Servicio } from '@/types/agenda';
 
 export default function HomePage() {
@@ -22,11 +23,6 @@ export default function HomePage() {
     };
     cargarServicios();
   }, []);
-
-  const getServiceBadge = (nombre: string) => {
-    const initial = nombre?.trim()?.charAt(0)?.toUpperCase();
-    return initial || 'S';
-  };
 
   return (
     <>
@@ -74,7 +70,7 @@ export default function HomePage() {
                     <Card className="p-5 cursor-pointer transition-all hover:border-primary hover:shadow-md">
                       <div className="flex items-start gap-4">
                         <div className="w-12 h-12 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-lg">
-                          {getServiceBadge(servicio.nombre)}
+                          {getVisibleServiceIcon(servicio.icono, servicio.nombre)}
                         </div>
                         <div className="flex-1">
                           <h3 className="font-bold text-foreground">{servicio.nombre}</h3>
