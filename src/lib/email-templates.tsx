@@ -1,4 +1,4 @@
-﻿interface NuevoTurnoEmailProps {
+interface NuevoTurnoEmailProps {
   nombreCliente: string;
   telefono: string;
   email?: string;
@@ -39,139 +39,114 @@ interface MultipleTurnosEmailProps {
   }>;
 }
 
-export const nuevoTurnoEmail = ({ nombreCliente, telefono, email, servicio, fecha, hora, cantidadPersonas }: NuevoTurnoEmailProps) => `
+const baseStyles = `
+  body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; }
+  .container { max-width: 640px; margin: 0 auto; padding: 20px; }
+  .header { color: #fff; padding: 28px; border-radius: 10px 10px 0 0; text-align: center; }
+  .content { background: #f9fafb; padding: 24px; border-radius: 0 0 10px 10px; }
+  .panel { background: #fff; border-radius: 8px; padding: 16px; margin: 16px 0; border-left: 4px solid #4f46e5; }
+  .row { display: flex; justify-content: space-between; gap: 16px; padding: 8px 0; border-bottom: 1px solid #eee; }
+  .row:last-child { border-bottom: none; }
+  .label { font-weight: 700; color: #4b5563; }
+  .footer { margin-top: 16px; text-align: center; color: #6b7280; font-size: 12px; }
+`;
+
+export const nuevoTurnoEmail = ({
+  nombreCliente,
+  telefono,
+  email,
+  servicio,
+  fecha,
+  hora,
+  cantidadPersonas,
+}: NuevoTurnoEmailProps) => `
 <!DOCTYPE html>
 <html>
 <head>
   <meta charset="utf-8">
   <style>
-    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-    .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-    .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
-    .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
-    .info-box { background: white; padding: 20px; margin: 20px 0; border-left: 4px solid #667eea; border-radius: 5px; }
-    .info-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; }
-    .info-label { font-weight: bold; color: #555; }
-    .info-value { color: #333; }
-    .footer { text-align: center; margin-top: 20px; color: #777; font-size: 12px; }
+    ${baseStyles}
+    .header { background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); }
   </style>
 </head>
 <body>
   <div class="container">
     <div class="header">
-      <h1>ðŸ’ˆ Nuevo Turno Reservado</h1>
-      <p>Turnos Web</p>
+      <h1 style="margin: 0;">Nuevo turno reservado</h1>
+      <p style="margin: 8px 0 0 0;">Turnos Web</p>
     </div>
     <div class="content">
-      <p>Â¡Hola! Se ha reservado un nuevo turno:</p>
-      
-      <div class="info-box">
-        <div class="info-row">
-          <span class="info-label">ðŸ‘¤ Cliente:</span>
-          <span class="info-value">${nombreCliente}</span>
-        </div>
-        <div class="info-row">
-          <span class="info-label">ðŸ“ž TelÃ©fono:</span>
-          <span class="info-value">${telefono}</span>
-        </div>
-        ${email ? `
-        <div class="info-row">
-          <span class="info-label">ðŸ“§ Email:</span>
-          <span class="info-value">${email}</span>
-        </div>
-        ` : ''}
-        <div class="info-row">
-          <span class="info-label">âœ‚ï¸ Servicio:</span>
-          <span class="info-value">${servicio}</span>
-        </div>
-        <div class="info-row">
-          <span class="info-label">ðŸ“… Fecha:</span>
-          <span class="info-value">${new Date(fecha).toLocaleDateString('es-AR', {
-  weekday: 'long',
-  year: 'numeric',
-  month: 'long',
-  day: 'numeric'
-})}</span>
-        </div>
-        <div class="info-row" style="border-bottom: none;">
-          <span class="info-label">ðŸ• Hora:</span>
-          <span class="info-value">${hora} hs</span>
-        </div>
+      <p>Se registro un nuevo turno.</p>
+      <div class="panel">
+        <div class="row"><span class="label">Cliente:</span><span>${nombreCliente}</span></div>
+        <div class="row"><span class="label">Telefono:</span><span>${telefono}</span></div>
+        ${email ? `<div class="row"><span class="label">Email:</span><span>${email}</span></div>` : ''}
+        ${cantidadPersonas > 1 ? `<div class="row"><span class="label">Personas:</span><span>${cantidadPersonas}</span></div>` : ''}
+        <div class="row"><span class="label">Servicio:</span><span>${servicio}</span></div>
+        <div class="row"><span class="label">Fecha:</span><span>${new Date(fecha).toLocaleDateString('es-AR', {
+          weekday: 'long',
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+        })}</span></div>
+        <div class="row"><span class="label">Hora:</span><span>${hora} hs</span></div>
       </div>
-      
-      <p>PodÃ©s contactar al cliente por WhatsApp haciendo clic <a href="https://wa.me/${telefono.replace(/\D/g, '')}" style="color: #667eea; text-decoration: none; font-weight: bold;">aquÃ­</a>.</p>
-    </div>
-    <div class="footer">
-      <p>Este es un email automÃ¡tico de Turnos Web</p>
+      <p>
+        Contacto directo:
+        <a href="https://wa.me/${telefono.replace(/\D/g, '')}" style="color:#4f46e5; font-weight:700; text-decoration:none;">
+          WhatsApp
+        </a>
+      </p>
+      <div class="footer">
+        <p>Email automatico generado por Turnos Web.</p>
+      </div>
     </div>
   </div>
 </body>
 </html>
 `;
 
-export const turnoCanceladoEmail = ({ nombreCliente, telefono, servicio, fecha, hora }: TurnoCanceladoEmailProps) => `
+export const turnoCanceladoEmail = ({
+  nombreCliente,
+  telefono,
+  servicio,
+  fecha,
+  hora,
+}: TurnoCanceladoEmailProps) => `
 <!DOCTYPE html>
 <html>
 <head>
   <meta charset="utf-8">
   <style>
-    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-    .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-    .header { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
-    .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
-    .info-box { background: white; padding: 20px; margin: 20px 0; border-left: 4px solid #ef4444; border-radius: 5px; }
-    .info-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; }
-    .info-label { font-weight: bold; color: #555; }
-    .info-value { color: #333; }
-    .alert { background: #fef2f2; border: 1px solid #fecaca; padding: 15px; border-radius: 5px; margin: 20px 0; }
-    .footer { text-align: center; margin-top: 20px; color: #777; font-size: 12px; }
+    ${baseStyles}
+    .header { background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%); }
+    .alert { background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 12px; color: #991b1b; }
   </style>
 </head>
 <body>
   <div class="container">
     <div class="header">
-      <h1>ðŸš« Turno Cancelado</h1>
-      <p>Turnos Web</p>
+      <h1 style="margin: 0;">Turno cancelado</h1>
+      <p style="margin: 8px 0 0 0;">Turnos Web</p>
     </div>
     <div class="content">
-      <div class="alert">
-        <p style="margin: 0; color: #991b1b;"><strong>âš ï¸ Un cliente ha cancelado su turno</strong></p>
+      <div class="alert"><strong>Un cliente cancelo su turno.</strong></div>
+      <div class="panel" style="border-left-color:#dc2626;">
+        <div class="row"><span class="label">Cliente:</span><span>${nombreCliente}</span></div>
+        <div class="row"><span class="label">Telefono:</span><span>${telefono}</span></div>
+        <div class="row"><span class="label">Servicio:</span><span>${servicio}</span></div>
+        <div class="row"><span class="label">Fecha:</span><span>${new Date(fecha).toLocaleDateString('es-AR', {
+          weekday: 'long',
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+        })}</span></div>
+        <div class="row"><span class="label">Hora:</span><span>${hora} hs</span></div>
       </div>
-      
-      <p>El siguiente turno fue cancelado por el cliente:</p>
-      
-      <div class="info-box">
-        <div class="info-row">
-          <span class="info-label">ðŸ‘¤ Cliente:</span>
-          <span class="info-value">${nombreCliente}</span>
-        </div>
-        <div class="info-row">
-          <span class="info-label">ðŸ“ž TelÃ©fono:</span>
-          <span class="info-value">${telefono}</span>
-        </div>
-        <div class="info-row">
-          <span class="info-label">âœ‚ï¸ Servicio:</span>
-          <span class="info-value">${servicio}</span>
-        </div>
-        <div class="info-row">
-          <span class="info-label">ðŸ“… Fecha:</span>
-          <span class="info-value">${new Date(fecha).toLocaleDateString('es-AR', {
-  weekday: 'long',
-  year: 'numeric',
-  month: 'long',
-  day: 'numeric'
-})}</span>
-        </div>
-        <div class="info-row" style="border-bottom: none;">
-          <span class="info-label">ðŸ• Hora:</span>
-          <span class="info-value">${hora} hs</span>
-        </div>
+      <p style="color:#059669; font-weight:700;">El horario quedo libre para nuevas reservas.</p>
+      <div class="footer">
+        <p>Email automatico generado por Turnos Web.</p>
       </div>
-      
-      <p style="color: #059669; font-weight: bold;">âœ… Este horario ya estÃ¡ disponible para nuevas reservas</p>
-    </div>
-    <div class="footer">
-      <p>Este es un email automÃ¡tico de Turnos Web</p>
     </div>
   </div>
 </body>
@@ -184,168 +159,141 @@ export const resumenDiarioEmail = ({ fecha, turnos }: ResumenDiarioEmailProps) =
 <head>
   <meta charset="utf-8">
   <style>
-    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-    .container { max-width: 700px; margin: 0 auto; padding: 20px; }
-    .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
-    .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
-    .summary { background: white; padding: 15px; margin-bottom: 20px; border-radius: 5px; text-align: center; }
-    .turno-card { background: white; padding: 20px; margin: 15px 0; border-left: 4px solid #667eea; border-radius: 5px; }
-    .turno-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-    .hora { font-size: 24px; font-weight: bold; color: #667eea; }
-    .estado { padding: 5px 15px; border-radius: 20px; font-size: 12px; font-weight: bold; }
+    ${baseStyles}
+    .container { max-width: 720px; margin: 0 auto; padding: 20px; }
+    .header { background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); }
+    .turno-card { background: #fff; border-radius: 8px; padding: 14px; margin: 12px 0; border-left: 4px solid #4f46e5; }
+    .turno-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 8px; }
+    .hora { font-size: 22px; font-weight: 700; color: #4f46e5; }
+    .estado { border-radius: 999px; padding: 4px 10px; font-size: 12px; font-weight: 700; }
     .estado-pendiente { background: #fef3c7; color: #92400e; }
-    .estado-confirmado { background: #dbeafe; color: #1e40af; }
-    .turno-info { color: #555; font-size: 14px; }
-    .no-turnos { text-align: center; padding: 40px; color: #999; }
-    .footer { text-align: center; margin-top: 20px; color: #777; font-size: 12px; }
+    .estado-confirmado { background: #dbeafe; color: #1e3a8a; }
+    .estado-completado { background: #dcfce7; color: #166534; }
+    .estado-cancelado { background: #fee2e2; color: #991b1b; }
+    .empty { text-align: center; color: #6b7280; padding: 24px; background: #fff; border-radius: 8px; }
   </style>
 </head>
 <body>
   <div class="container">
     <div class="header">
-      <h1>ðŸ“… Agenda del DÃ­a</h1>
-      <p>Turnos Web</p>
+      <h1 style="margin: 0;">Agenda del dia</h1>
+      <p style="margin: 8px 0 0 0;">Turnos Web</p>
     </div>
     <div class="content">
-      <div class="summary">
-        <h2 style="margin: 0; color: #667eea;">${new Date(fecha).toLocaleDateString('es-AR', {
-  weekday: 'long',
-  year: 'numeric',
-  month: 'long',
-  day: 'numeric'
-})}</h2>
-        <p style="margin: 10px 0 0 0; color: #777;">Total de turnos: <strong>${turnos.length}</strong></p>
-      </div>
-      
-      ${turnos.length === 0 ? `
-        <div class="no-turnos">
-          <p style="font-size: 48px; margin: 0;">ðŸ˜Š</p>
-          <p>No tenÃ©s turnos programados para hoy</p>
-          <p style="color: #999; font-size: 14px;">Â¡DisfrutÃ¡ tu dÃ­a libre!</p>
+      <div class="panel">
+        <div class="row">
+          <span class="label">Fecha:</span>
+          <span>${new Date(fecha).toLocaleDateString('es-AR', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+          })}</span>
         </div>
-      ` : turnos.map(turno => `
+        <div class="row"><span class="label">Total turnos:</span><span>${turnos.length}</span></div>
+      </div>
+
+      ${turnos.length === 0
+        ? `
+        <div class="empty">
+          <p style="margin:0;">No hay turnos programados para hoy.</p>
+        </div>
+      `
+        : turnos
+            .map(
+              (turno) => `
         <div class="turno-card">
-          <div class="turno-header">
+          <div class="turno-head">
             <span class="hora">${turno.hora} hs</span>
             <span class="estado estado-${turno.estado}">${turno.estado.toUpperCase()}</span>
           </div>
-          <div class="turno-info">
-            <p style="margin: 5px 0;"><strong>âœ‚ï¸ ${turno.servicio}</strong></p>
-            <p style="margin: 5px 0;">ðŸ‘¤ ${turno.nombreCliente}</p>
-            <p style="margin: 5px 0;">
-              ðŸ“ž <a href="https://wa.me/${turno.telefono.replace(/\D/g, '')}" style="color: #667eea; text-decoration: none;">${turno.telefono}</a>
-            </p>
-          </div>
+          <p style="margin:6px 0;"><strong>Servicio:</strong> ${turno.servicio}</p>
+          <p style="margin:6px 0;"><strong>Cliente:</strong> ${turno.nombreCliente}</p>
+          <p style="margin:6px 0;">
+            <strong>Telefono:</strong>
+            <a href="https://wa.me/${turno.telefono.replace(/\D/g, '')}" style="color:#4f46e5; text-decoration:none;">
+              ${turno.telefono}
+            </a>
+          </p>
         </div>
-      `).join('')}
-      
-      ${turnos.length > 0 ? `
-        <p style="margin-top: 30px; text-align: center; color: #555;">
-          Â¡Que tengas un excelente dÃ­a de trabajo! ðŸ’ª
-        </p>
-      ` : ''}
-    </div>
-    
-    <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;">
-      <p style="color: #999; font-size: 12px; margin: 5px 0;">Este es un email automÃ¡tico de Turnos Web</p>
+      `
+            )
+            .join('')}
+
+      ${turnos.length > 0 ? `<p style="text-align:center; color:#4b5563; margin-top:20px;">Buen dia de trabajo.</p>` : ''}
+
+      <div class="footer">
+        <p>Email automatico generado por Turnos Web.</p>
+      </div>
     </div>
   </div>
 </body>
 </html>
 `;
 
-export const multipleTurnosEmail = ({ nombreCliente, telefono, email, turnos, cantidadPersonas }: MultipleTurnosEmailProps) => `
+export const multipleTurnosEmail = ({
+  nombreCliente,
+  telefono,
+  email,
+  cantidadPersonas,
+  turnos,
+}: MultipleTurnosEmailProps) => `
 <!DOCTYPE html>
 <html>
 <head>
   <meta charset="utf-8">
   <style>
-    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; background-color: #f4f4f4; }
-    .container { max-width: 600px; margin: 20px auto; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-    .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; }
-    .header h1 { margin: 0; font-size: 28px; }
-    .header p { margin: 10px 0 0 0; opacity: 0.9; }
-    .content { padding: 30px; }
-    .cliente-info { background: #f9f9f9; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #667eea; }
-    .info-row { padding: 8px 0; display: flex; justify-content: space-between; border-bottom: 1px solid #eee; }
-    .info-row:last-child { border-bottom: none; }
-    .info-label { font-weight: bold; color: #555; }
-    .info-value { color: #333; }
-    .turnos-list { margin: 20px 0; }
-    .turno-item { background: white; border: 2px solid #667eea; border-radius: 8px; padding: 15px; margin: 10px 0; }
-    .turno-item h3 { margin: 0 0 10px 0; color: #667eea; font-size: 18px; }
-    .turno-detail { padding: 5px 0; color: #555; }
-    .badge { display: inline-block; background: #667eea; color: white; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: bold; margin-bottom: 10px; }
-    .footer { text-align: center; padding: 20px; border-top: 1px solid #eee; color: #777; font-size: 12px; }
-    .whatsapp-btn { display: inline-block; background: #25D366; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; margin-top: 20px; font-weight: bold; }
-    .whatsapp-btn:hover { background: #20BA5A; }
+    ${baseStyles}
+    .header { background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); }
+    .turno-item { background: #fff; border: 1px solid #d1d5db; border-left: 4px solid #4f46e5; border-radius: 8px; padding: 14px; margin: 10px 0; }
+    .badge { display: inline-block; background: #4f46e5; color: #fff; border-radius: 999px; padding: 3px 10px; font-size: 11px; font-weight: 700; margin-bottom: 8px; }
+    .cta { text-align: center; margin-top: 20px; }
+    .cta a { display: inline-block; background: #16a34a; color: #fff; text-decoration: none; font-weight: 700; padding: 10px 18px; border-radius: 8px; }
   </style>
 </head>
 <body>
   <div class="container">
     <div class="header">
-      <h1>ðŸ’ˆ ${turnos.length} Nuevos Turnos Reservados</h1>
-      <p>Turnos Web</p>
+      <h1 style="margin: 0;">${turnos.length} nuevos turnos reservados</h1>
+      <p style="margin: 8px 0 0 0;">Turnos Web</p>
     </div>
-    
     <div class="content">
-      <p>Â¡Hola! Un cliente ha reservado <strong>${turnos.length} turnos</strong>:</p>
-      
-      <div class="cliente-info">
-        <div class="info-row">
-          <span class="info-label">ðŸ‘¤ Cliente:</span>
-          <span class="info-value">${nombreCliente}</span>
-        </div>
-        <div class="info-row">
-          <span class="info-label">ðŸ“ž TelÃ©fono:</span>
-          <span class="info-value">${telefono}</span>
-        </div>
-        ${email ? `
-        <div class="info-row">
-          <span class="info-label">ðŸ“§ Email:</span>
-          <span class="info-value">${email}</span>
-        </div>
-        ` : ''}
-        <div class="info-row">
-          <span class="info-label">ðŸ‘¥ Cantidad:</span>
-          <span class="info-value">${cantidadPersonas} persona${cantidadPersonas > 1 ? 's' : ''}</span>
-        </div>
+      <p>Se registraron multiples turnos para un mismo cliente.</p>
+      <div class="panel">
+        <div class="row"><span class="label">Cliente:</span><span>${nombreCliente}</span></div>
+        <div class="row"><span class="label">Telefono:</span><span>${telefono}</span></div>
+        ${email ? `<div class="row"><span class="label">Email:</span><span>${email}</span></div>` : ''}
+        <div class="row"><span class="label">Cantidad:</span><span>${cantidadPersonas} persona${cantidadPersonas > 1 ? 's' : ''}</span></div>
       </div>
 
-      <h2 style="color: #667eea; margin-top: 30px;">ðŸ“‹ Turnos Reservados:</h2>
-      
-      <div class="turnos-list">
-        ${turnos.map((turno, index) => `
-          <div class="turno-item">
-            <span class="badge">Turno ${index + 1}</span>
-            <h3>${turno.servicio}</h3>
-            <div class="turno-detail">
-              ðŸ“… <strong>Fecha:</strong> ${new Date(turno.fecha).toLocaleDateString('es-AR', {
-  weekday: 'long',
-  year: 'numeric',
-  month: 'long',
-  day: 'numeric'
-})}
-            </div>
-            <div class="turno-detail">
-              ðŸ• <strong>Hora:</strong> ${turno.hora} hs
-            </div>
-          </div>
-        `).join('')}
+      <h3 style="color:#4f46e5; margin-top:24px;">Turnos reservados</h3>
+      ${turnos
+        .map(
+          (turno, index) => `
+        <div class="turno-item">
+          <span class="badge">Turno ${index + 1}</span>
+          <p style="margin:6px 0;"><strong>Servicio:</strong> ${turno.servicio}</p>
+          <p style="margin:6px 0;"><strong>Fecha:</strong> ${new Date(turno.fecha).toLocaleDateString('es-AR', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+          })}</p>
+          <p style="margin:6px 0;"><strong>Hora:</strong> ${turno.hora} hs</p>
+        </div>
+      `
+        )
+        .join('')}
+
+      <div class="cta">
+        <a href="https://wa.me/${telefono.replace(/\D/g, '')}">Contactar por WhatsApp</a>
       </div>
-      
-      <div style="text-align: center;">
-        <a href="https://wa.me/${telefono.replace(/\D/g, '')}" class="whatsapp-btn">
-          ðŸ’¬ Contactar por WhatsApp
-        </a>
+
+      <div class="footer">
+        <p>Email automatico generado por Turnos Web.</p>
       </div>
-    </div>
-    
-    <div class="footer">
-      <p>Este es un email automÃ¡tico de Turnos Web</p>
     </div>
   </div>
 </body>
 </html>
 `;
-

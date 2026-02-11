@@ -3,13 +3,15 @@ import { db } from '@/lib/firebase';
 import { collection, addDoc, serverTimestamp, query, where, getDocs } from 'firebase/firestore';
 import { sendEmail, NOTIFICATION_EMAIL } from '@/lib/email-config';
 import { nuevoTurnoEmail } from '@/lib/email-templates';
+import { formatServiceName } from '@/lib/reservas';
+import type { CitaTurno } from '@/types/agenda';
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const { servicioId, fecha, hora, nombre, telefono, email, cantidadPersonas } = body;
 
-    // ValidaciÃ³n bÃ¡sica
+    // Validacion basica
     if (!servicioId || !fecha || !hora || !nombre || !telefono) {
       return NextResponse.json(
         { error: 'Faltan datos requeridos' },
@@ -17,13 +19,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Obtener informaciÃ³n del servicio
+    // Obtener informacion del servicio
     const serviciosRef = collection(db, 'servicios');
     const serviciosSnapshot = await getDocs(serviciosRef);
     const servicio = serviciosSnapshot.docs.find(doc => doc.id === servicioId);
-    const servicioNombre = servicio ? `${servicio.data().icono} ${servicio.data().nombre}` : 'Servicio';
+    const servicioNombre = servicio
+      ? formatServiceName(servicio.data().icono || '', servicio.data().nombre || 'Servicio')
+      : 'Servicio';
 
-    // ðŸ”’ VERIFICACIÃ“N CRÃTICA: Comprobar si el horario YA estÃ¡ ocupado (race condition)
+    // Verificacion critica: comprobar si el horario ya esta ocupado (race condition)
     const fechaStr = new Date(fecha).toISOString().split('T')[0];
     const citasRef = collection(db, 'citas');
     const q = query(
@@ -33,7 +37,7 @@ export async function POST(request: NextRequest) {
     );
     const citasExistentes = await getDocs(q);
     
-    // Verificar si ya existe una cita para esa hora que NO estÃ© cancelada
+    // Verificar si ya existe una cita para esa hora que no este cancelada
     const horarioOcupado = citasExistentes.docs.some(doc => {
       const data = doc.data();
       return data.hora === hora && data.estado !== 'cancelado';
@@ -42,7 +46,7 @@ export async function POST(request: NextRequest) {
     if (horarioOcupado) {
       return NextResponse.json(
         { 
-          error: 'Lo sentimos, este horario acaba de ser reservado por otra persona. Por favor elegÃ­ otro horario.',
+          error: 'Lo sentimos, este horario acaba de ser reservado por otra persona. Por favor elegi otro horario.',
           code: 'HORARIO_OCUPADO'
         },
         { status: 409 } // 409 Conflict
@@ -76,12 +80,12 @@ export async function POST(request: NextRequest) {
 
       await sendEmail({
         to: NOTIFICATION_EMAIL,
-        subject: `ðŸ’ˆ Nuevo turno reservado - ${new Date(fecha).toLocaleDateString('es-AR')} ${hora}hs`,
+        subject: `Nuevo turno reservado - ${new Date(fecha).toLocaleDateString('es-AR')} ${hora}hs`,
         html: emailHtml,
       });
     } catch (emailError) {
       console.error('Error al enviar email (turno creado exitosamente):', emailError);
-      // No falla la creaciÃ³n del turno si el email falla
+      // No falla la creacion del turno si el email falla
     }
 
     return NextResponse.json(
@@ -108,7 +112,7 @@ export async function GET(request: NextRequest) {
 
     if (!fecha) {
       return NextResponse.json(
-        { error: 'Falta parÃ¡metro de fecha' },
+        { error: 'Falta parametro de fecha' },
         { status: 400 }
       );
     }
@@ -118,13 +122,13 @@ export async function GET(request: NextRequest) {
     const q = query(citasRef, where('fecha', '>=', fecha + 'T00:00:00'), where('fecha', '<=', fecha + 'T23:59:59'));
     const querySnapshot = await getDocs(q);
 
-    // Filtrar solo citas que no estÃ¡n canceladas (para liberar horarios cancelados)
-    const citas = querySnapshot.docs
-      .map(doc => ({
+    // Filtrar solo citas que no estan canceladas (para liberar horarios cancelados)
+    const citas: CitaTurno[] = querySnapshot.docs
+      .map((doc) => ({
         id: doc.id,
-        ...doc.data()
-      }) as any)
-      .filter((cita: any) => cita.estado !== 'cancelado');
+        ...doc.data(),
+      }) as CitaTurno)
+      .filter((cita) => cita.estado !== 'cancelado');
 
     return NextResponse.json({ citas }, { status: 200 });
   } catch (error) {

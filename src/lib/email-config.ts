@@ -1,6 +1,6 @@
 ﻿import nodemailer from 'nodemailer';
 
-// Email del profesional que recibirÃ¡ las notificaciones
+// Email del profesional que recibira las notificaciones
 export const NOTIFICATION_EMAIL = process.env.NOTIFICATION_EMAIL || 'staingosanchez@gmail.com';
 
 // Configurar transporter de Nodemailer con Gmail
@@ -27,10 +27,10 @@ export async function sendEmail({ to, subject, html }: SendEmailParams) {
       html,
     });
 
-    console.log('âœ… Email enviado exitosamente:', info.messageId);
+    console.log('[OK] Email enviado exitosamente:', info.messageId);
     return { success: true, data: info };
   } catch (error) {
-    console.error('âŒ Error al enviar email:', error);
+    console.error('[ERROR] Error al enviar email:', error);
     return { success: false, error };
   }
 }

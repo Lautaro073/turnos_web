@@ -1,11 +1,9 @@
-﻿import { redirect } from 'next/navigation';
-
-export default function AdminLayout({
+﻿export default function AdminLayout({
     children,
 }: {
     children: React.ReactNode;
 }) {
-    // TODO: Verificar autenticaciÃ³n
+    // TODO: Verificar autenticacion
     // Por ahora dejamos abierto para desarrollo
     // const isAuthenticated = false;
     // if (!isAuthenticated) {
@@ -23,7 +21,7 @@ export default function AdminLayout({
                             <a href="/turnosweb/horarios" className="text-sm hover:text-primary whitespace-nowrap">Horarios</a>
                             <a href="/turnosweb/servicios" className="text-sm hover:text-primary whitespace-nowrap">Servicios</a>
                             <a href="/turnosweb/turnos" className="text-sm hover:text-primary whitespace-nowrap">Turnos</a>
-                            <a href="/turnosweb/estadisticas" className="text-sm hover:text-primary whitespace-nowrap">EstadÃ­sticas</a>
+                            <a href="/turnosweb/estadisticas" className="text-sm hover:text-primary whitespace-nowrap">Estadisticas</a>
                         </nav>
                     </div>
                 </div>
@@ -34,6 +32,7 @@ export default function AdminLayout({
         </div>
     );
 }
+
 
 
 

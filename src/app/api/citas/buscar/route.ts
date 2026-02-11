@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/firebase';
-import { collection, query, where, getDocs } from 'firebase/firestore';
+import { collection, getDocs } from 'firebase/firestore';
+import { formatServiceName } from '@/lib/reservas';
 
 export async function POST(request: NextRequest) {
   try {
@@ -49,7 +50,7 @@ export async function POST(request: NextRequest) {
       const turnoData = turnoDoc.data();
       const servicio = serviciosSnapshot.docs.find(doc => doc.id === turnoData.servicioId);
       const servicioNombre = servicio 
-        ? `${servicio.data().icono} ${servicio.data().nombre}` 
+        ? formatServiceName(servicio.data().icono || '', servicio.data().nombre || 'Servicio')
         : 'Servicio';
 
       return {

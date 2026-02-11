@@ -1,4 +1,4 @@
-import Header from '@/components/cliente/Header';
+﻿import Header from '@/components/cliente/Header';
 import Footer from '@/components/cliente/Footer';
 import ServiceSelector from '@/components/cliente/ServiceSelector';
 import { Suspense } from 'react';
@@ -12,10 +12,10 @@ export default function ReservarPage() {
                 <div className="container mx-auto max-w-4xl">
                     <div className="text-center mb-8">
                         <h1 className="text-4xl font-bold text-foreground mb-3">
-                            Agendá tu Turno 📅
+                            Agenda tu turno
                         </h1>
                         <p className="text-muted-foreground">
-                            Seguí los pasos para reservar tu servicio
+                            Segui los pasos para reservar tu servicio
                         </p>
                     </div>
 
@@ -30,3 +30,4 @@ export default function ReservarPage() {
         </>
     );
 }
+

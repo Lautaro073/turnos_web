@@ -1,6 +1,6 @@
 ﻿'use client';
 
-import { useState, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,43 +8,34 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Plus, Trash2, Save } from 'lucide-react';
 import { toast } from 'sonner';
-
-interface Servicio {
-    id: string;
-    nombre: string;
-    descripcion: string;
-    precio: number;
-    duracionMinutos: number;
-    icono: string;
-    activo: boolean;
-    orden: number;
-}
+import { getVisibleServiceIcon } from '@/lib/reservas';
+import type { Servicio } from '@/types/agenda';
 
 export default function ServiciosAdmin() {
     const [servicios, setServicios] = useState<Servicio[]>([]);
     const [cargando, setCargando] = useState(true);
     const [guardando, setGuardando] = useState(false);
 
-    useEffect(() => {
-        cargarServicios();
-    }, []);
-
-    const cargarServicios = async () => {
+    const cargarServicios = useCallback(async () => {
         try {
             const response = await fetch('/api/servicios');
             const data = await response.json();
-            const serviciosLimpios = (data.servicios || []).map((s: Servicio) => ({
+            const serviciosCargados: Servicio[] = (data.servicios || []).map((s: Servicio) => ({
                 ...s,
-                icono: getIconoVisible(s.icono, s.nombre),
+                icono: s.icono || '',
             }));
-            setServicios(serviciosLimpios);
+            setServicios(serviciosCargados);
         } catch (error) {
             console.error('Error al cargar servicios:', error);
             toast.error('Error al cargar servicios');
         } finally {
             setCargando(false);
         }
-    };
+    }, []);
+
+    useEffect(() => {
+        cargarServicios();
+    }, [cargarServicios]);
 
     const agregarServicio = () => {
         const nuevoId = Date.now().toString();
@@ -54,26 +45,18 @@ export default function ServiciosAdmin() {
             descripcion: '',
             precio: 0,
             duracionMinutos: 40,
-            icono: 'S',
+            icono: '',
             activo: true,
             orden: servicios.length + 1,
         };
         setServicios([...servicios, nuevoServicio]);
     };
 
-    const getIconoVisible = (icono: string, nombre: string) => {
-        if (!icono || /[\u00C3\u00C2\u00E2]/.test(icono)) {
-            const initial = nombre?.trim()?.charAt(0)?.toUpperCase();
-            return initial || 'S';
-        }
-        return icono;
-    };
-
     const eliminarServicio = (id: string) => {
         setServicios(servicios.filter(s => s.id !== id));
     };
 
-    const actualizarServicio = (id: string, campo: keyof Servicio, valor: any) => {
+    const actualizarServicio = (id: string, campo: keyof Servicio, valor: Servicio[keyof Servicio]) => {
         setServicios(servicios.map(s =>
             s.id === id ? { ...s, [campo]: valor } : s
         ));
@@ -144,12 +127,12 @@ export default function ServiciosAdmin() {
             </div>
 
             <div className="grid gap-4">
-                {servicios.map((servicio, index) => (
+                {servicios.map((servicio) => (
                     <Card key={servicio.id} className="p-6">
                         <div className="space-y-4">
                             <div className="flex items-start justify-between">
                                 <div className="flex items-center gap-3">
-                                    <span className="text-3xl">{getIconoVisible(servicio.icono, servicio.nombre)}</span>
+                                    <span className="text-3xl">{getVisibleServiceIcon(servicio.icono, servicio.nombre)}</span>
                                     <Badge variant={servicio.activo ? 'default' : 'secondary'}>
                                         {servicio.activo ? 'Activo' : 'Inactivo'}
                                     </Badge>
@@ -189,11 +172,11 @@ export default function ServiciosAdmin() {
                                     <Label htmlFor={`icono-${servicio.id}`}>Icono (emoji)</Label>
                                     <Input
                                         id={`icono-${servicio.id}`}
-                                        value={servicio.icono}
+                                        value={servicio.icono || ''}
                                         onChange={(e) => actualizarServicio(servicio.id, 'icono', e.target.value)}
-                                        placeholder="Ej: A"
+                                        placeholder="Ej: ✂️"
                                         className="mt-1.5"
-                                        maxLength={2}
+                                        maxLength={4}
                                     />
                                 </div>
 

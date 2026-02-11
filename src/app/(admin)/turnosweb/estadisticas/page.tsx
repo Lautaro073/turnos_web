@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Calendar } from 'lucide-react';
+import type { EstadoTurno } from '@/types/agenda';
 
 interface Turno {
     id: string;
@@ -16,8 +17,7 @@ interface Turno {
     nombre: string;
     telefono: string;
     email?: string;
-    estado: 'pendiente' | 'confirmado' | 'completado' | 'cancelado';
-    createdAt: any;
+    estado: EstadoTurno;
 }
 
 interface Servicio {

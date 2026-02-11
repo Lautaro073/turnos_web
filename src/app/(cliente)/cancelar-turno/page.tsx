@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import Link from 'next/link';
+import type { EstadoTurno } from '@/types/agenda';
 
 interface TurnoEncontrado {
     id: string;
@@ -17,7 +18,7 @@ interface TurnoEncontrado {
     hora: string;
     nombre: string;
     telefono: string;
-    estado: string;
+    estado: EstadoTurno;
 }
 
 export default function CancelarTurnoPage() {
@@ -50,19 +51,19 @@ export default function CancelarTurnoPage() {
             const data = await response.json();
 
             if (!response.ok) {
-                setError(data.error || 'No se encontrÃ³ un turno con esos datos');
+                setError(data.error || 'No se encontro un turno con esos datos');
                 setLoading(false);
                 return;
             }
 
             setTurnosEncontrados(data.turnos || []);
 
-            // Si solo hay uno, seleccionarlo automÃ¡ticamente
+            // Si solo hay uno, seleccionarlo automaticamente
             if (data.turnos && data.turnos.length === 1) {
                 setTurnoSeleccionado(data.turnos[0]);
             }
-        } catch (err) {
-            setError('Error al buscar el turno. IntentÃ¡ nuevamente.');
+        } catch {
+            setError('Error al buscar el turno. Intenta nuevamente.');
         } finally {
             setLoading(false);
         }
@@ -92,8 +93,8 @@ export default function CancelarTurnoPage() {
             setTimeout(() => {
                 router.push('/');
             }, 3000);
-        } catch (err) {
-            setError('Error al cancelar el turno. IntentÃ¡ nuevamente.');
+        } catch {
+            setError('Error al cancelar el turno. Intenta nuevamente.');
         } finally {
             setLoading(false);
         }
@@ -107,14 +108,14 @@ export default function CancelarTurnoPage() {
                         <div className="mx-auto mb-4 w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
                             <CheckCircle2 className="w-10 h-10 text-green-600" />
                         </div>
-                        <CardTitle className="text-2xl">Â¡Turno Cancelado!</CardTitle>
+                        <CardTitle className="text-2xl">Turno cancelado</CardTitle>
                         <CardDescription>
                             Tu turno ha sido cancelado exitosamente. El administrador fue notificado.
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
                         <p className="text-sm text-muted-foreground text-center mb-4">
-                            Redirigiendo a la pÃ¡gina principal...
+                            Redirigiendo a la pagina principal...
                         </p>
                         <Link href="/">
                             <Button className="w-full">Volver al Inicio</Button>
@@ -132,17 +133,17 @@ export default function CancelarTurnoPage() {
                 <div className="text-center mb-8">
                     <h1 className="text-4xl font-bold mb-2">Cancelar Turno</h1>
                     <p className="text-muted-foreground">
-                        IngresÃ¡ tus datos para buscar y cancelar tu turno
+                        Ingresa tus datos para buscar y cancelar tu turno
                     </p>
                 </div>
 
                 {turnosEncontrados.length === 0 ? (
-                    /* Formulario de bÃºsqueda */
+                    /* Formulario de busqueda */
                     <Card>
                         <CardHeader>
                             <CardTitle>Buscar mi Turno</CardTitle>
                             <CardDescription>
-                                IngresÃ¡ los datos que usaste al reservar
+                                Ingresa los datos que usaste al reservar
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
@@ -154,7 +155,7 @@ export default function CancelarTurnoPage() {
                                         <Input
                                             id="nombre"
                                             type="text"
-                                            placeholder="Juan PÃ©rez"
+                                            placeholder="Juan Perez"
                                             className="pl-10"
                                             value={formData.nombre}
                                             onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
@@ -164,7 +165,7 @@ export default function CancelarTurnoPage() {
                                 </div>
 
                                 <div className="space-y-2">
-                                    <Label htmlFor="telefono">TelÃ©fono</Label>
+                                    <Label htmlFor="telefono">Telefono</Label>
                                     <div className="relative">
                                         <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                                         <Input
@@ -215,13 +216,13 @@ export default function CancelarTurnoPage() {
                         </CardContent>
                     </Card>
                 ) : turnosEncontrados.length > 1 && !turnoSeleccionado ? (
-                    /* Selector cuando hay mÃºltiples turnos */
+                    /* Selector cuando hay multiples turnos */
                     <div className="space-y-4">
                         <Card>
                             <CardHeader>
                                 <CardTitle>Turnos Encontrados ({turnosEncontrados.length})</CardTitle>
                                 <CardDescription>
-                                    TenÃ©s varios turnos para ese dÃ­a. HacÃ© click en el que querÃ©s cancelar.
+                                    Tienes varios turnos para ese dia. Haz click en el que quieres cancelar.
                                 </CardDescription>
                             </CardHeader>
                         </Card>
@@ -254,7 +255,7 @@ export default function CancelarTurnoPage() {
                                 <CardContent>
                                     <div className="bg-muted p-4 rounded-lg space-y-2">
                                         <div className="flex justify-between text-sm">
-                                            <span className="text-muted-foreground">ðŸ“… Fecha:</span>
+                                            <span className="text-muted-foreground">Fecha:</span>
                                             <span className="font-medium">
                                                 {new Date(turno.fecha).toLocaleDateString('es-AR', {
                                                     weekday: 'long',
@@ -265,11 +266,11 @@ export default function CancelarTurnoPage() {
                                             </span>
                                         </div>
                                         <div className="flex justify-between text-sm">
-                                            <span className="text-muted-foreground">ðŸ‘¤ Cliente:</span>
+                                            <span className="text-muted-foreground">Cliente:</span>
                                             <span className="font-medium">{turno.nombre}</span>
                                         </div>
                                         <div className="flex justify-between text-sm">
-                                            <span className="text-muted-foreground">ðŸ“ž TelÃ©fono:</span>
+                                            <span className="text-muted-foreground">Telefono:</span>
                                             <span className="font-medium">{turno.telefono}</span>
                                         </div>
                                     </div>
@@ -285,16 +286,16 @@ export default function CancelarTurnoPage() {
                             }}
                             className="w-full"
                         >
-                            â† Volver a Buscar
+                            Volver a buscar
                         </Button>
                     </div>
                 ) : turnoSeleccionado ? (
-                    /* ConfirmaciÃ³n de cancelaciÃ³n */
+                    /* Confirmacion de cancelacion */
                     <Card>
                         <CardHeader>
                             <CardTitle>Turno Encontrado</CardTitle>
                             <CardDescription>
-                                ConfirmÃ¡ que querÃ©s cancelar este turno
+                                Confirma que quieres cancelar este turno
                             </CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-4">
@@ -327,7 +328,7 @@ export default function CancelarTurnoPage() {
                             <Alert>
                                 <AlertCircle className="h-4 w-4" />
                                 <AlertDescription>
-                                    Esta acciÃ³n no se puede deshacer. El profesional serÃ¡ notificado automÃ¡ticamente.
+                                    Esta accion no se puede deshacer. El profesional sera notificado automaticamente.
                                 </AlertDescription>
                             </Alert>
 
@@ -344,7 +345,7 @@ export default function CancelarTurnoPage() {
                                     variant="outline"
                                     onClick={() => {
                                         setTurnoSeleccionado(null);
-                                        // Si hay mÃºltiples turnos, volver a la selecciÃ³n
+                                        // Si hay multiples turnos, volver a la seleccion
                                         if (turnosEncontrados.length <= 1) {
                                             setTurnosEncontrados([]);
                                         }

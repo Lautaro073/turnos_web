@@ -1,12 +1,4 @@
-interface Servicio {
-  id: string;
-  nombre: string;
-  descripcion: string;
-  precio: number;
-  duracionMinutos: number;
-  icono: string;
-  activo: boolean;
-}
+import type { Servicio } from '@/types/agenda';
 
 let serviciosCache: Servicio[] | null = null;
 let cacheTimestamp: number | null = null;

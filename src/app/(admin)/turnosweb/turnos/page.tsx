@@ -5,8 +5,10 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Calendar, Search, Phone, Mail, Clock, User } from 'lucide-react';
+import { Calendar, Search, Phone, Clock, User } from 'lucide-react';
 import { toast } from 'sonner';
+import { getVisibleServiceIcon } from '@/lib/reservas';
+import type { EstadoTurno, Servicio } from '@/types/agenda';
 
 interface Turno {
     id: string;
@@ -16,19 +18,14 @@ interface Turno {
     nombre: string;
     telefono: string;
     email?: string;
-    estado: 'pendiente' | 'confirmado' | 'completado' | 'cancelado';
-    createdAt: any;
+    estado: EstadoTurno;
 }
 
-interface Servicio {
-    id: string;
-    nombre: string;
-    icono: string;
-}
+type ServicioBasico = Pick<Servicio, 'id' | 'nombre' | 'icono'>;
 
 export default function TurnosAdmin() {
     const [turnos, setTurnos] = useState<Turno[]>([]);
-    const [servicios, setServicios] = useState<Servicio[]>([]);
+    const [servicios, setServicios] = useState<ServicioBasico[]>([]);
     const [cargando, setCargando] = useState(true);
     const [actualizando, setActualizando] = useState<string | null>(null);
     const [busqueda, setBusqueda] = useState('');
@@ -59,7 +56,7 @@ export default function TurnosAdmin() {
         }
     };
 
-    const cambiarEstado = async (turnoId: string, nuevoEstado: string) => {
+    const cambiarEstado = async (turnoId: string, nuevoEstado: EstadoTurno) => {
         setActualizando(turnoId);
         try {
             const response = await fetch(`/api/citas/${turnoId}`, {
@@ -74,7 +71,7 @@ export default function TurnosAdmin() {
             setTurnos(prevTurnos =>
                 prevTurnos.map(turno =>
                     turno.id === turnoId
-                        ? { ...turno, estado: nuevoEstado as any }
+                        ? { ...turno, estado: nuevoEstado }
                         : turno
                 )
             );
@@ -90,18 +87,21 @@ export default function TurnosAdmin() {
 
     const getServicioNombre = (servicioId: string) => {
         const servicio = servicios.find(s => s.id === servicioId);
-        return servicio ? `${servicio.icono} ${servicio.nombre}` : 'Servicio';
+        if (!servicio) {
+            return 'Servicio';
+        }
+        return `${getVisibleServiceIcon(servicio.icono, servicio.nombre)} ${servicio.nombre}`;
     };
 
-    const getEstadoBadge = (estado: string) => {
-        const variants: Record<string, { variant: any; label: string }> = {
+    const getEstadoBadge = (estado: EstadoTurno) => {
+        const variants: Record<EstadoTurno, { variant: 'default' | 'secondary' | 'outline' | 'destructive'; label: string }> = {
             pendiente: { variant: 'secondary', label: 'Pendiente' },
             confirmado: { variant: 'default', label: 'Confirmado' },
             completado: { variant: 'outline', label: 'Completado' },
             cancelado: { variant: 'destructive', label: 'Cancelado' },
         };
-        const config = variants[estado] || variants.pendiente;
-        return <Badge variant={config.variant as any}>{config.label}</Badge>;
+        const config = variants[estado];
+        return <Badge variant={config.variant}>{config.label}</Badge>;
     };
 
     const turnosFiltrados = turnos.filter(turno => {

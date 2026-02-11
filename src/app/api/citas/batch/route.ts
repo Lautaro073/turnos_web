@@ -3,13 +3,14 @@ import { db } from '@/lib/firebase';
 import { collection, addDoc, serverTimestamp, query, where, getDocs } from 'firebase/firestore';
 import { sendEmail, NOTIFICATION_EMAIL } from '@/lib/email-config';
 import { multipleTurnosEmail } from '@/lib/email-templates';
+import { formatServiceName } from '@/lib/reservas';
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const { citas, cantidadPersonas } = body;
 
-    // ValidaciÃ³n bÃ¡sica
+    // Validacion basica
     if (!citas || !Array.isArray(citas) || citas.length === 0) {
       return NextResponse.json(
         { error: 'Debe proporcionar al menos una cita' },
@@ -21,18 +22,21 @@ export async function POST(request: NextRequest) {
     for (const cita of citas) {
       if (!cita.servicioId || !cita.fecha || !cita.hora || !cita.nombre || !cita.telefono) {
         return NextResponse.json(
-          { error: 'Faltan datos requeridos en una o mÃ¡s citas' },
+          { error: 'Faltan datos requeridos en una o mas citas' },
           { status: 400 }
         );
       }
     }
 
-    // Obtener informaciÃ³n de servicios
+    // Obtener informacion de servicios
     const serviciosRef = collection(db, 'servicios');
     const serviciosSnapshot = await getDocs(serviciosRef);
-    const serviciosMap = new Map();
+    const serviciosMap = new Map<string, string>();
     serviciosSnapshot.docs.forEach(doc => {
-      serviciosMap.set(doc.id, `${doc.data().icono} ${doc.data().nombre}`);
+      serviciosMap.set(
+        doc.id,
+        formatServiceName(doc.data().icono || '', doc.data().nombre || 'Servicio')
+      );
     });
 
     // Verificar disponibilidad de todos los horarios antes de crear cualquiera
@@ -64,7 +68,7 @@ export async function POST(request: NextRequest) {
     if (horariosOcupados.length > 0) {
       return NextResponse.json(
         { 
-          error: 'Algunos horarios ya fueron reservados por otra persona. Por favor recargÃ¡ y seleccionÃ¡ otros turnos.',
+          error: 'Algunos horarios ya fueron reservados por otra persona. Por favor recarga y selecciona otros turnos.',
           code: 'HORARIO_OCUPADO',
           horariosOcupados
         },
@@ -107,12 +111,12 @@ export async function POST(request: NextRequest) {
 
       await sendEmail({
         to: NOTIFICATION_EMAIL,
-        subject: `ðŸ’ˆ ${citasCreadas.length} nuevos turnos reservados - ${citas[0].nombre}`,
+        subject: `${citasCreadas.length} nuevos turnos reservados - ${citas[0].nombre}`,
         html: emailHtml,
       });
     } catch (emailError) {
       console.error('Error al enviar email (turnos creados exitosamente):', emailError);
-      // No falla la creaciÃ³n si el email falla
+      // No falla la creacion si el email falla
     }
 
     return NextResponse.json(

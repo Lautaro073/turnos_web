@@ -3,10 +3,17 @@ import { db } from '@/lib/firebase';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { sendEmail, NOTIFICATION_EMAIL } from '@/lib/email-config';
 import { resumenDiarioEmail } from '@/lib/email-templates';
+import { formatServiceName } from '@/lib/reservas';
+import type { CitaTurno } from '@/types/agenda';
+
+type ServicioResumen = {
+  icono?: string;
+  nombre?: string;
+};
 
 export async function GET(request: NextRequest) {
   try {
-    // Verificar token de autenticaciÃ³n para seguridad (opcional pero recomendado)
+    // Verificar token de autenticacion para seguridad (opcional)
     const authHeader = request.headers.get('authorization');
     const expectedToken = process.env.CRON_SECRET;
     
@@ -21,7 +28,7 @@ export async function GET(request: NextRequest) {
     const hoy = new Date();
     const fechaStr = hoy.toISOString().split('T')[0];
 
-    // Consultar turnos del dÃ­a
+    // Consultar turnos del dia
     const citasRef = collection(db, 'citas');
     const q = query(
       citasRef, 
@@ -32,9 +39,9 @@ export async function GET(request: NextRequest) {
 
     // Obtener servicios para mostrar nombres
     const serviciosSnapshot = await getDocs(collection(db, 'servicios'));
-    const serviciosMap = new Map();
+    const serviciosMap = new Map<string, ServicioResumen>();
     serviciosSnapshot.docs.forEach(doc => {
-      serviciosMap.set(doc.id, doc.data());
+      serviciosMap.set(doc.id, doc.data() as ServicioResumen);
     });
 
     // Filtrar solo turnos no cancelados y ordenar por hora
@@ -42,14 +49,16 @@ export async function GET(request: NextRequest) {
       .map(doc => ({
         id: doc.id,
         ...doc.data()
-      }) as any)
-      .filter((t: any) => t.estado !== 'cancelado')
-      .sort((a: any, b: any) => a.hora.localeCompare(b.hora))
-      .map((turno: any) => {
+      }) as CitaTurno)
+      .filter((t) => t.estado !== 'cancelado')
+      .sort((a, b) => a.hora.localeCompare(b.hora))
+      .map((turno) => {
         const servicio = serviciosMap.get(turno.servicioId);
         return {
           hora: turno.hora,
-          servicio: servicio ? `${servicio.icono} ${servicio.nombre}` : 'Servicio',
+          servicio: servicio
+            ? formatServiceName(servicio.icono || '', servicio.nombre || 'Servicio')
+            : 'Servicio',
           nombreCliente: turno.nombre,
           telefono: turno.telefono,
           estado: turno.estado,
@@ -64,7 +73,7 @@ export async function GET(request: NextRequest) {
 
     await sendEmail({
       to: NOTIFICATION_EMAIL,
-      subject: `ðŸ“… Agenda del dÃ­a - ${new Date(fechaStr).toLocaleDateString('es-AR', { 
+      subject: `Agenda del dia - ${new Date(fechaStr).toLocaleDateString('es-AR', {
         weekday: 'long', 
         day: 'numeric', 
         month: 'long' 

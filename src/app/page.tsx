@@ -7,16 +7,7 @@ import { Card } from '@/components/ui/card';
 import Header from '@/components/cliente/Header';
 import Footer from '@/components/cliente/Footer';
 import { getServicios } from '@/lib/servicios-cache';
-
-interface Servicio {
-  id: string;
-  nombre: string;
-  descripcion: string;
-  precio: number;
-  duracionMinutos: number;
-  icono: string;
-  activo: boolean;
-}
+import type { Servicio } from '@/types/agenda';
 
 export default function HomePage() {
   const [servicios, setServicios] = useState<Servicio[]>([]);

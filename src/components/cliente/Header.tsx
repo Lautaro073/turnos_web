@@ -10,7 +10,7 @@ export default function Header() {
                     <span className="text-lg md:text-xl font-bold tracking-tight">Turnos Web</span>
                 </Link>
 
-                {/* NavegaciÃ³n Desktop */}
+                {/* Navegacion desktop */}
                 <nav className="hidden md:flex items-center gap-6">
                     <Link href="/" className="text-foreground/80 hover:text-foreground font-medium transition-colors">
                         Inicio
@@ -21,7 +21,7 @@ export default function Header() {
                     <ThemeToggle />
                 </nav>
 
-                {/* Botones mÃ³vil */}
+                {/* Botones movil */}
                 <div className="flex items-center gap-2 md:hidden">
                     <ThemeToggle />
                     <Link
@@ -32,7 +32,7 @@ export default function Header() {
                     </Link>
                 </div>
 
-                {/* BotÃ³n desktop */}
+                {/* Boton desktop */}
                 <Link
                     href="/reservar"
                     className="hidden md:block px-6 py-2.5 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-colors"

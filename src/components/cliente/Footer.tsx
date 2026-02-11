@@ -4,26 +4,15 @@ import { useState, useEffect } from 'react';
 import { Instagram, MapPin, Phone, X } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-
-interface FranjaHoraria {
-  horaInicio: string;
-  horaFin: string;
-}
-
-interface HorarioDia {
-  dia: string;
-  activo: boolean;
-  franjas?: FranjaHoraria[];
-  horaInicio?: string; // Compatibilidad hacia atrÃ¡s
-  horaFin?: string; // Compatibilidad hacia atrÃ¡s
-}
+import { dayNamesMatch } from '@/lib/reservas';
+import type { HorarioDiaConfig } from '@/types/agenda';
 
 export default function Footer() {
   const whatsappNumber = "+540000000000";
   const instagramHandle = "tu_cuenta";
   const direccion = "Tu ciudad, tu pais";
   const mapsUrl = "https://maps.google.com";
-  const [horarios, setHorarios] = useState<HorarioDia[]>([]);
+  const [horarios, setHorarios] = useState<HorarioDiaConfig[]>([]);
 
   useEffect(() => {
     const cargarHorarios = async () => {
@@ -38,27 +27,27 @@ export default function Footer() {
     cargarHorarios();
   }, []);
 
-  // Agrupar dÃ­as consecutivos con el mismo horario
+  // Agrupar dias consecutivos con el mismo horario
   const agruparHorarios = () => {
     if (!horarios.length) return [];
 
     const grupos: { dias: string; horario: string }[] = [];
-    const diasOrden = ['Lunes', 'Martes', 'MiÃ©rcoles', 'Jueves', 'Viernes', 'SÃ¡bado', 'Domingo'];
+    const diasOrden = ['Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado', 'Domingo'];
 
     let grupoActual: string[] = [];
     let horarioActual = '';
 
-    diasOrden.forEach((dia, index) => {
-      const config = horarios.find(h => h.dia === dia);
+    diasOrden.forEach((dia) => {
+      const config = horarios.find(h => dayNamesMatch(h.dia, dia));
 
       if (config?.activo) {
         let nuevoHorario = '';
 
-        // Nuevo formato con mÃºltiples franjas
+        // Nuevo formato con multiples franjas
         if (config.franjas && config.franjas.length > 0) {
           nuevoHorario = config.franjas.map(f => `${f.horaInicio} - ${f.horaFin}`).join(', ');
         }
-        // Formato antiguo (compatibilidad hacia atrÃ¡s)
+        // Formato antiguo (compatibilidad hacia atras)
         else if (config.horaInicio && config.horaFin) {
           nuevoHorario = `${config.horaInicio} - ${config.horaFin}`;
         }
@@ -91,7 +80,7 @@ export default function Footer() {
       }
     });
 
-    // Agregar Ãºltimo grupo
+    // Agregar ultimo grupo
     if (grupoActual.length > 0) {
       grupos.push({
         dias: grupoActual.length > 1
@@ -101,8 +90,8 @@ export default function Footer() {
       });
     }
 
-    // Agregar domingo cerrado si no estÃ¡ activo
-    const domingoCerrado = !horarios.find(h => h.dia === 'Domingo')?.activo;
+    // Agregar domingo cerrado si no esta activo
+    const domingoCerrado = !horarios.find(h => dayNamesMatch(h.dia, 'Domingo'))?.activo;
     if (domingoCerrado) {
       grupos.push({ dias: 'Domingo', horario: 'Cerrado' });
     }

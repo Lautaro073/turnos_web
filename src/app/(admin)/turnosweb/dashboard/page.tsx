@@ -24,7 +24,7 @@ export default function DashboardPage() {
 
                 <Link href="/turnosweb/servicios">
                     <Card className="p-6 hover:shadow-lg transition-all cursor-pointer hover:border-primary">
-                        <div className="text-4xl mb-3">✂️</div>
+                        <div className="text-4xl mb-3">🛠️</div>
                         <h3 className="text-xl font-bold text-foreground mb-2">Servicios</h3>
                         <p className="text-sm text-muted-foreground mb-4">
                             Administrá servicios, precios y duraciones
